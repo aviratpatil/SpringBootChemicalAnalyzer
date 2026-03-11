@@ -1,0 +1,16 @@
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\config\WebConfig.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\controller\AnalysisController.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\controller\IngredientController.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\DermaDataApplication.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\dto\AnalysisReport.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\dto\AnalysisRequest.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\dto\CombinationWarning.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\dto\IngredientInput.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\dto\IngredientResult.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\entity\CombinationRule.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\entity\IngredientRegulation.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\repository\CombinationRuleRepository.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\repository\IngredientRegulationRepository.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\service\ExtractionService.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\service\LlmService.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\service\SafetyScoreEngineService.java
