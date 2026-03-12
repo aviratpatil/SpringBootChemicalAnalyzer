@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import IngredientAnalyzer from './components/IngredientAnalyzer';
 import SafetyResultsDashboard from './components/SafetyResultsDashboard';
-import './index.css';
 
 function App() {
   const [report, setReport] = useState(null);
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-black">
+    <div className="min-h-screen flex flex-col relative overflow-x-hidden bg-black">
       {/* ── Decorative Background ── */}
       <div className="fixed inset-0 pointer-events-none -z-10">
         <div className="absolute top-0 left-0 w-full h-full bg-black" />

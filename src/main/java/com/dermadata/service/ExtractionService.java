@@ -11,7 +11,7 @@ import java.util.*;
  * Mock AI Extraction Service — normalizes raw ingredient text into standard INCI names.
  */
 @Service
-public class ExtractionService {
+public class    ExtractionService {
 
     private static final Logger log = LoggerFactory.getLogger(ExtractionService.class);
     private static final Map<String, String> INCI_MAP = new LinkedHashMap<>();
@@ -185,6 +185,18 @@ public class ExtractionService {
             String raw = parts[i].trim();
             if (raw.isEmpty()) continue;
 
+            // Extract percentage concentration before cleaning
+            Double extractedConcentration = null;
+            java.util.regex.Pattern percentPattern = java.util.regex.Pattern.compile("(\\d+\\.?\\d*)\\s*%");
+            java.util.regex.Matcher m = percentPattern.matcher(raw);
+            if (m.find()) {
+                try {
+                    extractedConcentration = Double.parseDouble(m.group(1));
+                } catch (NumberFormatException e) {
+                    log.warn("Failed to parse concentration from: {}", m.group(1));
+                }
+            }
+
             // Remove concentration info like "(60 mg)" or "150mg" or "q.s."
             String cleaned = raw.replaceAll("\\(.*?\\)", "")
                                 .replaceAll("\\d+\\s*mg", "")
@@ -226,7 +238,7 @@ public class ExtractionService {
             ii.setInciName(normalized);
             ii.setPosition(results.size() + 1);
             ii.setConfidenceScore(confidence);
-            ii.setConcentration(null);
+            ii.setConcentration(extractedConcentration);
             results.add(ii);
         }
         return results;

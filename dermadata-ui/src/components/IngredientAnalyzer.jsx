@@ -112,12 +112,12 @@ export default function IngredientAnalyzer({ onAnalysisComplete }) {
                         <button
                             key={label}
                             onClick={() => setProductType(label)}
-                            className={`flex items-center justify-center gap-2.5 py-3 rounded-xl text-sm font-bold tracking-wide transition-all duration-300 cursor-pointer
+                            className={`flex items-center justify-center gap-2.5 w-full py-4 rounded-xl text-base font-bold tracking-wide transition-all duration-300 cursor-pointer
                 ${productType === label
                                     ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-black shadow-lg shadow-emerald-500/25'
                                     : 'bg-white/[0.03] text-neutral-500 border border-white/[0.05] hover:bg-white/[0.06] hover:text-neutral-300'}`}
                         >
-                            <span className="text-base">{icon}</span> {label}
+                            <span className="text-lg">{icon}</span> {label}
                         </button>
                     ))}
                 </div>
@@ -153,9 +153,9 @@ export default function IngredientAnalyzer({ onAnalysisComplete }) {
 
                         <button
                             {...getRootProps()}
-                            className="w-full py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.05] text-neutral-400 font-bold text-xs tracking-widest hover:bg-white/[0.07] transition-all cursor-pointer flex items-center justify-center gap-2 mt-auto"
+                            className="w-full py-4 rounded-xl bg-white/[0.04] border border-white/[0.05] text-neutral-400 font-bold text-sm tracking-widest hover:bg-white/[0.07] transition-all cursor-pointer flex items-center justify-center gap-3 mt-auto"
                         >
-                            <Camera className="w-3.5 h-3.5" /> SELECT IMAGE
+                            <Camera className="w-4 h-4" /> SELECT IMAGE
                         </button>
                     </div>
 
@@ -175,9 +175,9 @@ export default function IngredientAnalyzer({ onAnalysisComplete }) {
                         <button
                             onClick={handleExtractFromText}
                             disabled={!rawText.trim() || extracting}
-                            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs tracking-[0.15em] uppercase hover:from-emerald-500 hover:to-teal-500 disabled:opacity-25 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10 mt-auto"
+                            className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm tracking-[0.15em] uppercase hover:from-emerald-500 hover:to-teal-500 disabled:opacity-25 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center gap-3 shadow-lg shadow-emerald-500/10 mt-auto"
                         >
-                            {extracting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                            {extracting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
                             EXTRACT & NORMALIZE
                         </button>
                         <p className="text-neutral-600 text-[10px] text-center mt-2">Provide comma-separated chemical names.</p>
@@ -251,13 +251,13 @@ export default function IngredientAnalyzer({ onAnalysisComplete }) {
                     </div>
 
                     {/* CTA */}
-                    <div className="px-5 py-4 border-t border-white/[0.04] flex justify-center">
+                    <div className="p-5 border-t border-white/[0.04] w-full">
                         <button
                             onClick={handleAnalyze}
                             disabled={loading || ingredients.length === 0}
-                            className="px-10 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-black text-sm tracking-[0.1em] uppercase hover:shadow-xl hover:shadow-emerald-500/20 disabled:opacity-25 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-3 cursor-pointer"
+                            className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-black text-base tracking-[0.1em] uppercase hover:shadow-xl hover:shadow-emerald-500/20 disabled:opacity-25 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer"
                         >
-                            {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> ANALYZING...</> : <><ShieldCheck className="w-5 h-5" /> GENERATE COMPLIANCE REPORT</>}
+                            {loading ? <><Loader2 className="w-6 h-6 animate-spin" /> ANALYZING...</> : <><ShieldCheck className="w-6 h-6" /> GENERATE COMPLIANCE REPORT</>}
                         </button>
                     </div>
                 </div>
@@ -265,9 +265,9 @@ export default function IngredientAnalyzer({ onAnalysisComplete }) {
 
             {/* ── Disabled CTA when no ingredients ── */}
             {ingredients.length === 0 && (
-                <div className="flex justify-center animate-fade-in-up" style={{ animationDelay: '240ms' }}>
-                    <div className="px-10 py-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.05] text-neutral-600 font-black text-sm tracking-[0.1em] uppercase flex items-center gap-3">
-                        <ShieldCheck className="w-5 h-5" /> CALCULATE YOUR SAFETY SCORE
+                <div className="w-full animate-fade-in-up" style={{ animationDelay: '240ms' }}>
+                    <div className="w-full py-5 rounded-2xl bg-white/[0.03] border border-white/[0.05] text-neutral-600 font-black text-base tracking-[0.1em] uppercase flex items-center justify-center gap-3">
+                        <ShieldCheck className="w-6 h-6" /> CALCULATE YOUR SAFETY SCORE
                     </div>
                 </div>
             )}
