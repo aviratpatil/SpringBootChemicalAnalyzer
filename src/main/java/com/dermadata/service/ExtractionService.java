@@ -11,7 +11,7 @@ import java.util.*;
  * Mock AI Extraction Service — normalizes raw ingredient text into standard INCI names.
  */
 @Service
-public class    ExtractionService {
+public class ExtractionService {
 
     private static final Logger log = LoggerFactory.getLogger(ExtractionService.class);
     private static final Map<String, String> INCI_MAP = new LinkedHashMap<>();

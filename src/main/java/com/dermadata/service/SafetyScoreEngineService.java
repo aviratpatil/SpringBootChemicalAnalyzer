@@ -173,16 +173,29 @@ public class SafetyScoreEngineService {
     private boolean checkCombinationViolation(CombinationRule rule,
                                                IngredientInput inputA,
                                                IngredientInput inputB) {
+        // Case 1: Concentration of ingredient A is known and exceeds the safe limit
         if (rule.getSafeConcentrationA() != null
                 && inputA.getConcentration() != null
                 && inputA.getConcentration() > rule.getSafeConcentrationA()) {
             return true;
         }
 
+        // Case 2: Concentration of ingredient B is known and exceeds the required limit
+        if (rule.getRequiredConcentrationB() != null
+                && inputB.getConcentration() != null
+                && inputB.getConcentration() > rule.getRequiredConcentrationB()) {
+            return true;
+        }
+
+        // Case 3: No concentration thresholds defined — co-presence alone is the concern
+        // (e.g., double allergens, reactive pairs, or banned ingredient combos).
+        // Only flag if the rule explicitly has no concentration guards (both null),
+        // meaning the rule applies purely based on both ingredients being present.
         if (rule.getSafeConcentrationA() == null && rule.getRequiredConcentrationB() == null) {
             return true;
         }
 
+        // Case 4: Rule has a safe limit but ingredient concentration is unknown (null) — skip
         return false;
     }
 }
