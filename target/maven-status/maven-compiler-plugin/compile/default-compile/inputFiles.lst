@@ -11,6 +11,11 @@ E:\SpringBootChemicalProject\src\main\java\com\dermadata\entity\CombinationRule.
 E:\SpringBootChemicalProject\src\main\java\com\dermadata\entity\IngredientRegulation.java
 E:\SpringBootChemicalProject\src\main\java\com\dermadata\repository\CombinationRuleRepository.java
 E:\SpringBootChemicalProject\src\main\java\com\dermadata\repository\IngredientRegulationRepository.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\scoring\CombinationViolationRule.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\scoring\ExceededConcentrationRule.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\scoring\ProhibitedScoringRule.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\scoring\ScoringRule.java
+E:\SpringBootChemicalProject\src\main\java\com\dermadata\scoring\ScoringRuleRegistry.java
 E:\SpringBootChemicalProject\src\main\java\com\dermadata\service\ExtractionService.java
 E:\SpringBootChemicalProject\src\main\java\com\dermadata\service\LlmService.java
 E:\SpringBootChemicalProject\src\main\java\com\dermadata\service\SafetyScoreEngineService.java

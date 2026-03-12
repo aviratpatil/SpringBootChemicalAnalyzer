@@ -21,15 +21,19 @@ public class SafetyScoreEngineService {
     private final IngredientRegulationRepository regulationRepo;
     private final CombinationRuleRepository combinationRepo;
 
+    private final com.dermadata.scoring.ScoringRuleRegistry scoringRegistry;
+
     private static final int BASELINE_SCORE = 100;
     private static final int PROHIBITED_PENALTY = 20;
     private static final int EXCEEDED_CONCENTRATION_PENALTY = 10;
     private static final int COMBINATION_VIOLATION_PENALTY = 5;
 
     public SafetyScoreEngineService(IngredientRegulationRepository regulationRepo,
-                                     CombinationRuleRepository combinationRepo) {
+                                     CombinationRuleRepository combinationRepo,
+                                     com.dermadata.scoring.ScoringRuleRegistry scoringRegistry) {
         this.regulationRepo = regulationRepo;
         this.combinationRepo = combinationRepo;
+        this.scoringRegistry = scoringRegistry;
     }
 
     /**
@@ -52,9 +56,14 @@ public class SafetyScoreEngineService {
             if (regOpt.isPresent()) {
                 IngredientRegulation reg = regOpt.get();
                 IngredientResult result = evaluateIngredient(input, reg, productType);
+                
+                // Apply scoring rules (Strategy Pattern)
+                int penalty = applyScoringRules(result);
+                result.setPenaltyPoints(penalty);
+                score -= penalty;
+                
                 results.add(result);
 
-                score -= result.getPenaltyPoints();
                 if ("PROHIBITED".equals(result.getStatus())) {
                     prohibitedCount++;
                     flaggedCount++;
@@ -104,9 +113,11 @@ public class SafetyScoreEngineService {
                     w.setCondition(rule.getCondition());
                     w.setExplanation(rule.getExplanation());
                     w.setSource(rule.getSource());
-                    w.setPenaltyPoints(COMBINATION_VIOLATION_PENALTY);
+                    
+                    int combinationPenalty = scoringRegistry.getCombinationPenalty();
+                    w.setPenaltyPoints(combinationPenalty);
                     warnings.add(w);
-                    score -= COMBINATION_VIOLATION_PENALTY;
+                    score -= combinationPenalty;
                 }
             }
         }
@@ -134,27 +145,30 @@ public class SafetyScoreEngineService {
         report.setCombinationViolations(warnings.size());
         return report;
     }
+    
+    private int applyScoringRules(IngredientResult result) {
+        int totalPenalty = 0;
+        for (com.dermadata.scoring.ScoringRule rule : scoringRegistry.getRules()) {
+            totalPenalty += rule.calculatePenalty(result);
+        }
+        return totalPenalty;
+    }
 
     private IngredientResult evaluateIngredient(IngredientInput input,
                                                  IngredientRegulation reg,
                                                  String productType) {
-        int penalty = 0;
         String status;
 
         if (Boolean.TRUE.equals(reg.getProhibited())) {
             status = "PROHIBITED";
-            penalty = PROHIBITED_PENALTY;
         } else if (reg.getMaxConcentration() != null
                 && input.getConcentration() != null
                 && input.getConcentration() > reg.getMaxConcentration()) {
             status = "EXCEEDED";
-            penalty = EXCEEDED_CONCENTRATION_PENALTY;
         } else if (Boolean.TRUE.equals(reg.getRestricted())) {
             status = "RESTRICTED";
-            penalty = 0;
         } else {
             status = "SAFE";
-            penalty = 0;
         }
 
         IngredientResult r = new IngredientResult();
@@ -166,7 +180,8 @@ public class SafetyScoreEngineService {
         r.setStatus(status);
         r.setRegulationRef(reg.getRegulationRef());
         r.setConditions(reg.getConditions());
-        r.setPenaltyPoints(penalty);
+        // Penalty is set later by the strategy rules
+        r.setPenaltyPoints(0);
         return r;
     }
 
