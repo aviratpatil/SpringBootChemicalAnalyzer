@@ -43,6 +43,18 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Flyway Core -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        
+        <!-- Flyway Postgres (Required for Spring Boot 3+) -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+
         <!-- Lombok removed: incompatible with Java 24 -->
 
         <!-- Jackson for JSON -->
