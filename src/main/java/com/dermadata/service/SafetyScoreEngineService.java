@@ -47,6 +47,7 @@ public class SafetyScoreEngineService {
         int prohibitedCount = 0;
         int exceededCount = 0;
         int flaggedCount = 0;
+        int notRegulatedCount = 0;
 
         // ── Step 1: Check each ingredient against regulations ──
         for (IngredientInput input : ingredients) {
@@ -60,6 +61,7 @@ public class SafetyScoreEngineService {
                 // Apply scoring rules (Strategy Pattern)
                 int penalty = applyScoringRules(result);
                 result.setPenaltyPoints(penalty);
+                result.setAliases(input.getAliases());
                 score -= penalty;
                 
                 results.add(result);
@@ -75,6 +77,9 @@ public class SafetyScoreEngineService {
                 }
             } else {
                 // Ingredient not found in regulation DB → mark as not regulated
+                notRegulatedCount++;
+                flaggedCount++; // since unknown is not strictly safe
+                
                 IngredientResult nr = new IngredientResult();
                 nr.setInciName(input.getInciName());
                 nr.setDetectedConcentration(input.getConcentration());
@@ -84,40 +89,53 @@ public class SafetyScoreEngineService {
                 nr.setStatus("NOT_REGULATED");
                 nr.setRegulationRef(null);
                 nr.setConditions(null);
-                nr.setPenaltyPoints(0);
+                
+                // Apply scoring rules (Strategy Pattern)
+                int penalty = applyScoringRules(nr);
+                nr.setPenaltyPoints(penalty);
+                nr.setAliases(input.getAliases());
+                score -= penalty;
+                
                 results.add(nr);
             }
         }
 
         // ── Step 2: Check combination rules ──
-        List<String> inciNames = ingredients.stream()
+        Set<String> normalizedNames = ingredients.stream()
                 .map(i -> i.getInciName().trim().toLowerCase())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
-        List<CombinationRule> matchedRules = combinationRepo.findRulesForIngredients(inciNames);
+        List<CombinationRule> matchedRules = combinationRepo.findRulesForIngredients(new ArrayList<>(normalizedNames));
 
         for (CombinationRule rule : matchedRules) {
-            Optional<IngredientInput> inputA = ingredients.stream()
-                    .filter(i -> i.getInciName().equalsIgnoreCase(rule.getIngredientA()))
-                    .findFirst();
-            Optional<IngredientInput> inputB = ingredients.stream()
-                    .filter(i -> i.getInciName().equalsIgnoreCase(rule.getIngredientB()))
-                    .findFirst();
+            String ruleA = rule.getIngredientA().trim().toLowerCase();
+            String ruleB = rule.getIngredientB().trim().toLowerCase();
 
-            if (inputA.isPresent() && inputB.isPresent()) {
-                boolean violated = checkCombinationViolation(rule, inputA.get(), inputB.get());
-                if (violated) {
-                    CombinationWarning w = new CombinationWarning();
-                    w.setIngredientA(rule.getIngredientA());
-                    w.setIngredientB(rule.getIngredientB());
-                    w.setCondition(rule.getCondition());
-                    w.setExplanation(rule.getExplanation());
-                    w.setSource(rule.getSource());
-                    
-                    int combinationPenalty = scoringRegistry.getCombinationPenalty();
-                    w.setPenaltyPoints(combinationPenalty);
-                    warnings.add(w);
-                    score -= combinationPenalty;
+            if (normalizedNames.contains(ruleA) && normalizedNames.contains(ruleB)) {
+                
+                Optional<IngredientInput> inputA = ingredients.stream()
+                        .filter(i -> i.getInciName().trim().toLowerCase().equals(ruleA))
+                        .findFirst();
+                Optional<IngredientInput> inputB = ingredients.stream()
+                        .filter(i -> i.getInciName().trim().toLowerCase().equals(ruleB))
+                        .findFirst();
+
+                if (inputA.isPresent() && inputB.isPresent()) {
+                    boolean violated = checkCombinationViolation(rule, inputA.get(), inputB.get());
+                    if (violated) {
+                        CombinationWarning w = new CombinationWarning();
+                        w.setIngredientA(rule.getIngredientA());
+                        w.setIngredientB(rule.getIngredientB());
+                        w.setCondition(rule.getCondition());
+                        w.setExplanation(rule.getExplanation());
+                        w.setSource(rule.getSource());
+                        
+                        // We can't access scoringRegistry.getCombinationPenalty() easily if it's not a getter,
+                        int combinationPenalty = scoringRegistry.getCombinationPenalty();
+                        w.setPenaltyPoints(combinationPenalty);
+                        warnings.add(w);
+                        score -= combinationPenalty;
+                    }
                 }
             }
         }
@@ -125,10 +143,27 @@ public class SafetyScoreEngineService {
         // ── Clamp score to [0, 100] ──
         score = Math.max(0, Math.min(100, score));
 
+        boolean hardCapApplied = false;
+        String overrideReason = null;
+
+        if (prohibitedCount >= 1) {
+            if (score > 40) {
+                score = 40; // Hard cap
+                hardCapApplied = true;
+                overrideReason = "Score overridden: " + prohibitedCount + " EU-prohibited substance(s) detected";
+            }
+        }
+
         String category;
         if (score >= 71) category = "SAFE";
         else if (score >= 41) category = "CAUTION";
         else category = "DANGER";
+
+        
+        List<String> insights = new ArrayList<>();
+        if (notRegulatedCount > 0) {
+            insights.add(notRegulatedCount + " ingredient(s) not found in EU CosIng database — safety unknown.");
+        }
 
         AnalysisReport report = new AnalysisReport();
         report.setSafetyScore(score);
@@ -136,13 +171,16 @@ public class SafetyScoreEngineService {
         report.setScoreCategory(category);
         report.setIngredientResults(results);
         report.setCombinationWarnings(warnings);
-        report.setLlmInsights(new ArrayList<>());
+        report.setLlmInsights(insights);
         report.setAnalyzedAt(LocalDateTime.now());
         report.setTotalIngredients(ingredients.size());
         report.setFlaggedIngredients(flaggedCount);
         report.setProhibitedCount(prohibitedCount);
         report.setExceededCount(exceededCount);
         report.setCombinationViolations(warnings.size());
+        report.setNotRegulatedCount(notRegulatedCount);
+        report.setHardCapApplied(hardCapApplied);
+        report.setOverrideReason(overrideReason);
         return report;
     }
     

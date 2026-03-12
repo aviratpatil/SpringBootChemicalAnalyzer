@@ -1,11 +1,15 @@
 package com.dermadata.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class IngredientInput {
     private String rawName;
     private String inciName;
     private Double concentration;
     private Integer position;
     private Double confidenceScore;
+    private List<String> aliases = new ArrayList<>();
 
     public IngredientInput() {}
 
@@ -27,4 +31,6 @@ public class IngredientInput {
     public void setPosition(Integer position) { this.position = position; }
     public Double getConfidenceScore() { return confidenceScore; }
     public void setConfidenceScore(Double confidenceScore) { this.confidenceScore = confidenceScore; }
+    public List<String> getAliases() { return aliases; }
+    public void setAliases(List<String> aliases) { this.aliases = aliases; }
 }

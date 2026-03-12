@@ -258,4 +258,52 @@ public class ExtractionService {
                 .replaceAll("[^a-z0-9\\s,/'-]", "");
         return INCI_MAP.getOrDefault(key, raw.toUpperCase().trim());
     }
+
+    // ── Deduplication ─────────────────────────────────────────────────────────
+
+    /**
+     * Collapses duplicate / aliased ingredients.
+     * Two inputs are considered the same if their resolved INCI names are equal
+     * (case-insensitive).  The first occurrence wins; subsequent occurrences have
+     * their raw name appended to the canonical entry's alias list.
+     *
+     * @return a {@link DeduplicationResult} containing the de-duped list and count.
+     */
+    public DeduplicationResult deduplicateIngredients(List<IngredientInput> inputs) {
+        // LinkedHashMap preserves first-encounter order
+        Map<String, IngredientInput> seen = new LinkedHashMap<>();
+        int removed = 0;
+
+        for (IngredientInput input : inputs) {
+            String key = input.getInciName().trim().toLowerCase();
+            if (seen.containsKey(key)) {
+                // Duplicate — merge raw name into the canonical entry's alias list
+                seen.get(key).getAliases().add(input.getRawName());
+                removed++;
+            } else {
+                // First occurrence — record it and seed its alias list with own raw name
+                input.getAliases().clear();
+                input.getAliases().add(input.getRawName());
+                seen.put(key, input);
+            }
+        }
+
+        log.info("Deduplication complete: {} inputs → {} unique, {} removed",
+                inputs.size(), seen.size(), removed);
+        return new DeduplicationResult(new ArrayList<>(seen.values()), removed);
+    }
+
+    /** Wraps the result of {@link #deduplicateIngredients}. */
+    public static class DeduplicationResult {
+        private final List<IngredientInput> deduplicated;
+        private final int duplicatesRemoved;
+
+        public DeduplicationResult(List<IngredientInput> deduplicated, int duplicatesRemoved) {
+            this.deduplicated = deduplicated;
+            this.duplicatesRemoved = duplicatesRemoved;
+        }
+
+        public List<IngredientInput> getDeduplicated() { return deduplicated; }
+        public int getDuplicatesRemoved() { return duplicatesRemoved; }
+    }
 }

@@ -48,7 +48,12 @@ public class AnalysisController {
             }
         }
 
+        // Deduplicate by INCI name before scoring
+        ExtractionService.DeduplicationResult dedup = extractionService.deduplicateIngredients(ingredients);
+        ingredients = dedup.getDeduplicated();
+
         AnalysisReport report = scoreEngine.analyze(ingredients, request.getProductType());
+        report.setDuplicatesRemoved(dedup.getDuplicatesRemoved());
         List<String> llmInsights = llmService.getLlmCombinationAnalysis(ingredients, request.getProductType());
         report.setLlmInsights(llmInsights);
 

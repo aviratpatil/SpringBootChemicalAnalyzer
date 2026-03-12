@@ -1,5 +1,8 @@
 package com.dermadata.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class IngredientResult {
     private String inciName;
     private Double detectedConcentration;
@@ -10,6 +13,7 @@ public class IngredientResult {
     private String regulationRef;
     private String conditions;
     private Integer penaltyPoints;
+    private List<String> aliases = new ArrayList<>();
 
     public IngredientResult() {}
 
@@ -45,4 +49,6 @@ public class IngredientResult {
     public void setConditions(String conditions) { this.conditions = conditions; }
     public Integer getPenaltyPoints() { return penaltyPoints; }
     public void setPenaltyPoints(Integer penaltyPoints) { this.penaltyPoints = penaltyPoints; }
+    public List<String> getAliases() { return aliases; }
+    public void setAliases(List<String> aliases) { this.aliases = aliases; }
 }

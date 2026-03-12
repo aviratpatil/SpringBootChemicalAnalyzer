@@ -13,7 +13,7 @@ const STATUS_CONFIG = {
     RESTRICTED: { badge: 'bg-amber-500/15 text-amber-400 border-amber-500/25', icon: AlertTriangle, label: 'RESTRICTED' },
     EXCEEDED: { badge: 'bg-red-500/15 text-red-400 border-red-500/25', icon: XCircle, label: 'EXCEEDED' },
     PROHIBITED: { badge: 'bg-red-500/25 text-red-300 border-red-500/40', icon: Ban, label: 'PROHIBITED' },
-    NOT_REGULATED: { badge: 'bg-neutral-500/15 text-neutral-400 border-neutral-500/25', icon: Shield, label: 'NOT REGULATED' },
+    NOT_REGULATED: { badge: 'bg-neutral-500/15 text-yellow-500 border-neutral-500/25', icon: TriangleAlert, label: 'NOT REGULATED' },
 };
 
 export default function SafetyResultsDashboard({ report, onBack }) {
@@ -75,6 +75,19 @@ export default function SafetyResultsDashboard({ report, onBack }) {
                     New Analysis (+)
                 </button>
             </div>
+
+            {/* ════ PROHIBITED WARNING BANNER ════ */}
+            {report.hardCapApplied && (
+                <div className="bg-red-500/20 border border-red-500/40 rounded-xl p-4 flex items-center justify-center gap-3 animate-fade-in-up mt-6 mb-2 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
+                    <TriangleAlert className="w-6 h-6 text-red-400 animate-pulse" />
+                    <p className="text-white font-black tracking-wide">
+                        ⛔ AUTOMATIC DANGER — Prohibited substance detected
+                    </p>
+                    <span className="text-red-300 text-xs font-bold border border-red-500/30 rounded-full px-2 py-0.5 ml-2">
+                        {report.overrideReason}
+                    </span>
+                </div>
+            )}
 
             {/* ════ SCORE CARD ════ */}
             <div className="glass-card p-8 animate-fade-in-up" style={{ animationDelay: '50ms' }}>

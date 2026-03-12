@@ -16,6 +16,10 @@ public class AnalysisReport {
     private Integer prohibitedCount;
     private Integer exceededCount;
     private Integer combinationViolations;
+    private Integer notRegulatedCount;
+    private Integer duplicatesRemoved;
+    private Boolean hardCapApplied;
+    private String overrideReason;
 
     public AnalysisReport() {}
 
@@ -62,4 +66,16 @@ public class AnalysisReport {
     public void setExceededCount(Integer exceededCount) { this.exceededCount = exceededCount; }
     public Integer getCombinationViolations() { return combinationViolations; }
     public void setCombinationViolations(Integer combinationViolations) { this.combinationViolations = combinationViolations; }
+    
+    public Integer getNotRegulatedCount() { return notRegulatedCount; }
+    public void setNotRegulatedCount(Integer notRegulatedCount) { this.notRegulatedCount = notRegulatedCount; }
+    
+    public Integer getDuplicatesRemoved() { return duplicatesRemoved; }
+    public void setDuplicatesRemoved(Integer duplicatesRemoved) { this.duplicatesRemoved = duplicatesRemoved; }
+
+    public Boolean getHardCapApplied() { return hardCapApplied; }
+    public void setHardCapApplied(Boolean hardCapApplied) { this.hardCapApplied = hardCapApplied; }
+    
+    public String getOverrideReason() { return overrideReason; }
+    public void setOverrideReason(String overrideReason) { this.overrideReason = overrideReason; }
 }
